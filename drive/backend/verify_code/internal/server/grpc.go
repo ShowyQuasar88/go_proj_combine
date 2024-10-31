@@ -1,7 +1,8 @@
 package server
 
 import (
-	v1 "verify_code/api/helloworld/v1"
+	hw_v1 "verify_code/api/helloworld/v1"
+	vc_v1 "verify_code/api/v1"
 	"verify_code/internal/conf"
 	"verify_code/internal/service"
 
@@ -11,7 +12,7 @@ import (
 )
 
 // NewGRPCServer new a gRPC server.
-func NewGRPCServer(c *conf.Server, greeter *service.GreeterService, logger log.Logger) *grpc.Server {
+func NewGRPCServer(c *conf.Server, greeter *service.GreeterService, verifyCode *service.VerifyCodeService, logger log.Logger) *grpc.Server {
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),
@@ -27,6 +28,7 @@ func NewGRPCServer(c *conf.Server, greeter *service.GreeterService, logger log.L
 		opts = append(opts, grpc.Timeout(c.Grpc.Timeout.AsDuration()))
 	}
 	srv := grpc.NewServer(opts...)
-	v1.RegisterGreeterServer(srv, greeter)
+	hw_v1.RegisterGreeterServer(srv, greeter)
+	vc_v1.RegisterVerifyCodeServer(srv, verifyCode)
 	return srv
 }
