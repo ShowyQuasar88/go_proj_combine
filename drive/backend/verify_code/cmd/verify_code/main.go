@@ -2,8 +2,9 @@ package main
 
 import (
 	"flag"
+	"math/rand"
 	"os"
-
+	"time"
 	"verify_code/internal/conf"
 
 	"github.com/go-kratos/kratos/v2"
@@ -79,6 +80,9 @@ func main() {
 		panic(err)
 	}
 	defer cleanup()
+
+	// set rand seed
+	rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	// start and wait for stop signal
 	if err := app.Run(); err != nil {

@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"math/rand"
-
 	pb "verify_code/api/v1"
 )
 
