@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package api.customer;
+
+import "google/api/annotations.proto";
+
+option go_package = "customer/api/customer;customer";
+
+service Customer {
+	// 获取验证码
+	rpc GetVerifyCode (GetVerifyCodeReq) returns (GetVerifyCodeResp) {
+		option (google.api.http) = {
+			get: "/customer/get-verify-code"
+		};
+	}
+}
+
+message GetVerifyCodeReq {
+	string Phone = 1;
+
+}
+
+message GetVerifyCodeResp {
+	int32 Code = 1;
+	string Message = 2;
+	string Data = 3;
+}
