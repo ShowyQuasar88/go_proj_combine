@@ -2,6 +2,7 @@
 
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { Heart, MessageCircle, Share2, Volume2, VolumeX } from 'lucide-react'
+import ShareModal from './ShareModal'
 
 interface VideoCardProps {
   video: {
@@ -27,6 +28,7 @@ const VideoCard = forwardRef<HTMLVideoElement, VideoCardProps>(({ video, isActiv
   const [likePosition, setLikePosition] = useState({ x: 0, y: 0 })
   const lastTapTime = useRef(0)
   const likeCount = useRef(video.likes)
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false)
 
   // 暴露video元素给父组件
   useImperativeHandle(ref, () => videoRef.current as HTMLVideoElement)
@@ -98,6 +100,7 @@ const VideoCard = forwardRef<HTMLVideoElement, VideoCardProps>(({ video, isActiv
     <div 
       className="relative aspect-[9/16] max-w-[600px] mx-auto bg-gray-900 rounded-lg overflow-hidden group"
       onClick={handleDoubleTap}
+      data-testid="video-container"
     >
       <video
         ref={videoRef}
@@ -147,7 +150,13 @@ const VideoCard = forwardRef<HTMLVideoElement, VideoCardProps>(({ video, isActiv
           <MessageCircle className="w-6 h-6" />
           <span className="text-xs">{video.comments}</span>
         </button>
-        <button className="p-3 rounded-full bg-gray-800/60 hover:bg-gray-700/60 transition-colors">
+        <button 
+          className="p-3 rounded-full bg-gray-800/60 hover:bg-gray-700/60 transition-colors"
+          onClick={(e) => {
+            e.stopPropagation()
+            setIsShareModalOpen(true)
+          }}
+        >
           <Share2 className="w-6 h-6" />
           <span className="text-xs">{video.shares}</span>
         </button>
@@ -156,8 +165,7 @@ const VideoCard = forwardRef<HTMLVideoElement, VideoCardProps>(({ video, isActiv
       {/* 音量控制 */}
       <div 
         className="absolute right-4 bottom-4 flex flex-col items-center"
-        onMouseEnter={() => setIsVolumeSliderVisible(true)}
-        onMouseLeave={() => setIsVolumeSliderVisible(false)}
+        data-testid="volume-control"
       >
         <button
           onClick={toggleMute}
@@ -198,9 +206,10 @@ const VideoCard = forwardRef<HTMLVideoElement, VideoCardProps>(({ video, isActiv
         <div 
           className="absolute pointer-events-none"
           style={{
-            left: likePosition.x - 50, // 心形图标的一半宽度
-            top: likePosition.y - 50,  // 心形图标的一半高度
+            left: likePosition.x - 50,
+            top: likePosition.y - 50,
           }}
+          data-testid="like-animation"
         >
           <Heart 
             className={`
@@ -211,6 +220,13 @@ const VideoCard = forwardRef<HTMLVideoElement, VideoCardProps>(({ video, isActiv
           />
         </div>
       )}
+
+      {/* 分享弹窗 */}
+      <ShareModal 
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        videoUrl={video.videoUrl}
+      />
     </div>
   )
 })
