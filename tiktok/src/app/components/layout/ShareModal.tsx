@@ -10,11 +10,20 @@ interface ShareModalProps {
   onClose: () => void
   videoUrl: string
   videoId: number
+  onShareSuccess?: () => void
 }
 
-export default function ShareModal({ isOpen, onClose, videoUrl, videoId }: ShareModalProps) {
+export default function ShareModal({ isOpen, onClose, videoUrl, videoId, onShareSuccess }: ShareModalProps) {
   const [showCopySuccess, setShowCopySuccess] = useState(false)
   const [showQRCode, setShowQRCode] = useState(false)
+  const [showShareSuccess, setShowShareSuccess] = useState(false)
+  
+  useEffect(() => {
+    if (!isOpen) {
+      setShowQRCode(false)
+      setShowCopySuccess(false)
+    }
+  }, [isOpen])
   
   if (!isOpen) return null
 
@@ -30,14 +39,20 @@ export default function ShareModal({ isOpen, onClose, videoUrl, videoId }: Share
     if (option.id === 'copy') {
       setShowCopySuccess(true)
       setTimeout(() => setShowCopySuccess(false), 2000)
+      onShareSuccess?.()
     } else {
-      onClose()
+      setShowShareSuccess(true)
+      onShareSuccess?.()
+      setTimeout(() => {
+        setShowShareSuccess(false)
+        onClose()
+      }, 1500)
     }
   }
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 animate-fade-in"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           setShowQRCode(false)
@@ -45,7 +60,7 @@ export default function ShareModal({ isOpen, onClose, videoUrl, videoId }: Share
         }
       }}
     >
-      <div className="bg-gray-900 rounded-lg w-full max-w-sm p-4">
+      <div className="bg-gray-900 rounded-lg w-full max-w-sm p-4 animate-slide-up">
         {!showQRCode ? (
           <>
             <div className="flex justify-between items-center mb-4">
@@ -106,6 +121,12 @@ export default function ShareModal({ isOpen, onClose, videoUrl, videoId }: Share
         {showCopySuccess && (
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-full">
             链接已复制
+          </div>
+        )}
+
+        {showShareSuccess && (
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-green-500 text-white px-6 py-3 rounded-full animate-scale-in">
+            分享成功
           </div>
         )}
       </div>

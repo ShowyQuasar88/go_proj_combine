@@ -29,6 +29,7 @@ const VideoCard = forwardRef<HTMLVideoElement, VideoCardProps>(({ video, isActiv
   const lastTapTime = useRef(0)
   const likeCount = useRef(video.likes)
   const [isShareModalOpen, setIsShareModalOpen] = useState(false)
+  const shareCount = useRef(video.shares)
 
   // 暴露video元素给父组件
   useImperativeHandle(ref, () => videoRef.current as HTMLVideoElement)
@@ -96,6 +97,10 @@ const VideoCard = forwardRef<HTMLVideoElement, VideoCardProps>(({ video, isActiv
     lastTapTime.current = now
   }
 
+  const handleShare = () => {
+    setIsShareModalOpen(true)
+  }
+
   return (
     <div 
       className="relative aspect-[9/16] max-w-[600px] mx-auto bg-gray-900 rounded-lg overflow-hidden group"
@@ -154,11 +159,11 @@ const VideoCard = forwardRef<HTMLVideoElement, VideoCardProps>(({ video, isActiv
           className="p-3 rounded-full bg-gray-800/60 hover:bg-gray-700/60 transition-colors"
           onClick={(e) => {
             e.stopPropagation()
-            setIsShareModalOpen(true)
+            handleShare()
           }}
         >
           <Share2 className="w-6 h-6" />
-          <span className="text-xs">{video.shares}</span>
+          <span className="text-xs">{shareCount.current}</span>
         </button>
       </div>
 
@@ -227,6 +232,9 @@ const VideoCard = forwardRef<HTMLVideoElement, VideoCardProps>(({ video, isActiv
         onClose={() => setIsShareModalOpen(false)}
         videoUrl={video.videoUrl}
         videoId={video.id}
+        onShareSuccess={() => {
+          shareCount.current += 1
+        }}
       />
     </div>
   )
