@@ -226,6 +226,7 @@ const VideoCard = forwardRef<HTMLVideoElement, VideoCardProps>(({ video, isActiv
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}
         videoUrl={video.videoUrl}
+        videoId={video.id}
       />
     </div>
   )
