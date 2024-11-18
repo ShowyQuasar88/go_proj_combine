@@ -28,7 +28,7 @@ export default function ShareModal({ isOpen, onClose, videoUrl, videoId, onShare
   if (!isOpen) return null
 
   const handleShare = async (option: ShareOption) => {
-    const shareUrl = `${window.location.origin}/video/${videoId}`
+    const shareUrl = videoUrl || `${window.location.origin}/video/${videoId}`
     
     if (option.id === 'wechat') {
       setShowQRCode(true)
@@ -107,7 +107,7 @@ export default function ShareModal({ isOpen, onClose, videoUrl, videoId, onShare
             </div>
             <div className="bg-white p-4 rounded-lg inline-block">
               <QRCodeSVG 
-                value={`${window.location.origin}/video/${videoId}`}
+                value={videoUrl || `${window.location.origin}/video/${videoId}`}
                 size={200}
                 level="H"
               />

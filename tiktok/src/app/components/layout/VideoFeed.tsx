@@ -7,6 +7,7 @@ import VideoCard from './VideoCard'
 const generateMockVideos = (start: number, count: number) => {
   return Array.from({ length: count }, (_, i) => ({
     id: start + i,
+    authorId: start + i,
     author: `用户${start + i}`,
     description: `这是第${start + i}个视频 #抖音 #生活`,
     videoUrl: `https://example.com/video${start + i}.mp4`,
@@ -71,6 +72,28 @@ export default function VideoFeed() {
     return () => observer.disconnect()
   }, [videos])
 
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault()
+      if (e.deltaY > 0 && currentVideoIndex < videos.length - 1) {
+        setCurrentVideoIndex(prev => prev + 1)
+      } else if (e.deltaY < 0 && currentVideoIndex > 0) {
+        setCurrentVideoIndex(prev => prev - 1)
+      }
+    }
+
+    const container = document.getElementById('video-feed-container')
+    if (container) {
+      container.addEventListener('wheel', handleWheel, { passive: false })
+    }
+
+    return () => {
+      if (container) {
+        container.removeEventListener('wheel', handleWheel)
+      }
+    }
+  }, [currentVideoIndex, videos.length])
+
   const loadMoreVideos = async () => {
     try {
       setLoading(true)
@@ -86,21 +109,30 @@ export default function VideoFeed() {
   }
 
   return (
-    <div className="flex flex-col space-y-4 py-4">
-      {videos.map((video, index) => (
-        <VideoCard 
-          key={video.id} 
-          video={video}
-          ref={(el) => { videoRefs.current[index] = el }}
-          isActive={currentVideoIndex === index}
-        />
-      ))}
-      
-      {/* 加载更多指示器 */}
-      <div ref={loadMoreRef} className="flex justify-center py-4">
-        {loading && (
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
-        )}
+    <div 
+      id="video-feed-container"
+      className="h-full w-full relative overflow-hidden"
+    >
+      <div 
+        className="h-full transition-transform duration-300"
+        style={{
+          transform: `translateY(-${currentVideoIndex * 100}%)`
+        }}
+      >
+        {videos.map((video, index) => (
+          <div key={video.id} className="h-full flex items-center justify-center relative">
+            <div className="absolute right-4 h-full flex items-center">
+              <div className="flex flex-col items-center space-y-6">
+                {/* 互动按钮将在这里渲染 */}
+              </div>
+            </div>
+            <VideoCard 
+              video={video}
+              ref={(el) => { videoRefs.current[index] = el }}
+              isActive={currentVideoIndex === index}
+            />
+          </div>
+        ))}
       </div>
     </div>
   )
