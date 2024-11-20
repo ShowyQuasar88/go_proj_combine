@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useState } from 'react'
 import VideoCard from './VideoCard'
+import CommentDrawer from '../comment/CommentDrawer'
 
 // 模拟视频数据生成器
 const generateMockVideos = (start: number, count: number) => {
@@ -21,6 +22,7 @@ export default function VideoFeed() {
   const [videos, setVideos] = useState(generateMockVideos(1, 5))
   const [loading, setLoading] = useState(false)
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0)
+  const [openCommentVideoId, setOpenCommentVideoId] = useState<number | null>(null)
   const observerRef = useRef<IntersectionObserver>()
   const loadMoreRef = useRef<HTMLDivElement>(null)
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([])
@@ -108,6 +110,11 @@ export default function VideoFeed() {
     }
   }
 
+  // 添加一个副作用来处理视频切换时关闭评论抽屉
+  useEffect(() => {
+    setOpenCommentVideoId(null)
+  }, [currentVideoIndex])
+
   return (
     <div 
       id="video-feed-container"
@@ -120,16 +127,22 @@ export default function VideoFeed() {
         }}
       >
         {videos.map((video, index) => (
-          <div key={video.id} className="h-full flex items-center justify-center relative">
-            <div className="absolute right-4 h-full flex items-center">
-              <div className="flex flex-col items-center space-y-6">
-                {/* 互动按钮将在这里渲染 */}
-              </div>
-            </div>
+          <div key={video.id} className="h-full relative">
             <VideoCard 
               video={video}
               ref={(el) => { videoRefs.current[index] = el }}
               isActive={currentVideoIndex === index}
+              isCommentOpen={video.id === openCommentVideoId}
+              onCommentOpenChange={(open) => {
+                setOpenCommentVideoId(open ? video.id : null)
+              }}
+            />
+            <CommentDrawer
+              isOpen={video.id === openCommentVideoId}
+              onClose={() => {
+                setOpenCommentVideoId(null)
+              }}
+              videoId={video.id}
             />
           </div>
         ))}
