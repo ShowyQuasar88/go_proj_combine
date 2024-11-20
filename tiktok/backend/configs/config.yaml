@@ -13,3 +13,15 @@ data:
     addr: 127.0.0.1:6379
     read_timeout: 0.2s
     write_timeout: 0.2s
+
+trace:
+  endpoint: otel-collector:4318
+  sampler: 1.0
+  environment: development
+
+log:
+  level: debug
+  filename: logs/app.log
+  maxSize: 100
+  maxAge: 7
+  maxBackups: 30
