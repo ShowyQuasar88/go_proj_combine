@@ -10,6 +10,7 @@ import (
 	"backend/internal/biz"
 	"backend/internal/conf"
 	"backend/internal/data"
+	"backend/internal/pkg/crypto"
 	"backend/internal/server"
 	"backend/internal/service"
 	"github.com/go-kratos/kratos/v2"
@@ -23,7 +24,7 @@ import (
 // Injectors from wire.go:
 
 // wireApp init kratos application.
-func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*kratos.App, func(), error) {
+func wireApp(confServer *conf.Server, confData *conf.Data, security *conf.Security, logger log.Logger) (*kratos.App, func(), error) {
 	dataData, cleanup, err := data.NewData(confData, logger)
 	if err != nil {
 		return nil, nil, err
@@ -31,7 +32,12 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*
 	greeterRepo := data.NewGreeterRepo(dataData, logger)
 	greeterUsecase := biz.NewGreeterUsecase(greeterRepo, logger)
 	greeterService := service.NewGreeterService(greeterUsecase)
-	userRepo := data.NewUserRepo(dataData, logger)
+	cryptoCrypto, err := crypto.NewCrypto(security)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	userRepo := data.NewUserRepo(dataData, cryptoCrypto, logger)
 	userUseCase := biz.NewUserUseCase(userRepo, logger)
 	userService := service.NewUserService(userUseCase)
 	grpcServer := server.NewGRPCServer(confServer, greeterService, userService, logger)

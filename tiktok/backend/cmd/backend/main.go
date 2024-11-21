@@ -53,22 +53,22 @@ func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {
 
 // initLogger 初始化日志
 func initLogger(c *conf.Log) log.Logger {
-    return sys_log.NewLogger(&sys_log.Options{
-        Level:      c.Level,
-        Filename:   c.Filename,
-        MaxSize:    int(c.MaxSize),
-        MaxAge:     int(c.MaxAge),
-        MaxBackups: int(c.MaxBackups),
-    })
+	return sys_log.NewLogger(&sys_log.Options{
+		Level:      c.Level,
+		Filename:   c.Filename,
+		MaxSize:    int(c.MaxSize),
+		MaxAge:     int(c.MaxAge),
+		MaxBackups: int(c.MaxBackups),
+	})
 }
 
 // initTrace 初始化链路追踪
 func initTrace(c *conf.Trace) (*tracesdk.TracerProvider, error) {
-    return trace.NewTracerProvider(&trace.Options{
-        ServiceName: Name,
-        Endpoint:    c.Endpoint,
-        Sampler:     c.Sampler,
-    })
+	return trace.NewTracerProvider(&trace.Options{
+		ServiceName: Name,
+		Endpoint:    c.Endpoint,
+		Sampler:     c.Sampler,
+	})
 }
 
 func main() {
@@ -100,7 +100,7 @@ func main() {
 	}
 	defer tp.Shutdown(context.Background())
 
-	app, cleanup, err := wireApp(bc.Server, bc.Data, logger)
+	app, cleanup, err := wireApp(bc.Server, bc.Data, bc.Security, logger)
 	if err != nil {
 		panic(err)
 	}

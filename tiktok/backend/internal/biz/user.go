@@ -9,6 +9,8 @@ type User struct {
 	ID       string
 	Username string
 	Password string
+	Phone    string
+	Email    string
 }
 
 // UserRepo 数据访问层的抽象接口

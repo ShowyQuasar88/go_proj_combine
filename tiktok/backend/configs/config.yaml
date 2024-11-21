@@ -25,3 +25,8 @@ log:
   maxSize: 100
   maxAge: 7
   maxBackups: 30
+
+security:
+  aesKey: "ae1654e3123f62ba3380906bc1b2ee78bf99420ed4f520d1e811a4a61fe6af54"
+  aesIv: "c3e3cfb22167e26adeb0eafcc4b58016"
+  bcrypt_cost: 12
