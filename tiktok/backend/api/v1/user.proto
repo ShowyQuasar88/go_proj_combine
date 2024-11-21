@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package v1;
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+import "v1/common.proto";
+
+option go_package = "backend/api/v1;v1";
+
+// 用户服务接口定义
+service User {
+    // 用户注册
+    rpc Register (RegisterRequest) returns (Response) {
+        option (google.api.http) = {
+            post: "/v1/user/register"
+            body: "*"   // 使用 * 表示整个消息作为请求体
+        };
+    }
+}
+
+message RegisterRequest {
+    string username = 1 [(validate.rules).string = {
+        min_len: 3,
+        max_len: 20,
+        pattern: "^[^<>?%&/\\\\]+$"    // 不允许特殊字符
+    }];
+    string password = 2 [(validate.rules).string = {
+        min_len: 8,
+        max_len: 20
+    }];
+}
+
+message RegisterResponse {
+    int64 userId = 1;
+    string token = 2;
+}
