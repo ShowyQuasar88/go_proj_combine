@@ -5,6 +5,8 @@ import (
 	"backend/internal/biz"
 	"backend/internal/pkg/response"
 	"context"
+	"errors"
+	"gorm.io/gorm"
 )
 
 // UserService 是用户服务的实现
@@ -27,6 +29,9 @@ func (s *UserService) Register(ctx context.Context, req *v1.RegisterRequest) (*v
 		Email:    req.Email,
 	}
 	if err := s.uc.Register(ctx, user); err != nil {
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return response.SuccessWithMsg("用户已存在"), nil
+		}
 		return response.Error(v1.ErrorCode_SYSTEM_ERROR, err.Error()), err
 	}
 	return response.SuccessWithMsg("注册成功"), nil
