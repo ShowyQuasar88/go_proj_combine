@@ -3,6 +3,7 @@ package service
 import (
 	v1 "backend/api/v1"
 	"backend/internal/biz"
+	"backend/internal/pkg/response"
 	"context"
 )
 
@@ -26,15 +27,7 @@ func (s *UserService) Register(ctx context.Context, req *v1.RegisterRequest) (*v
 		Email:    req.Email,
 	}
 	if err := s.uc.Register(ctx, user); err != nil {
-		return &v1.Response{
-			Code:    int32(v1.ErrorCode_SYSTEM_ERROR),
-			Success: false,
-			Message: err.Error(),
-		}, err
+		return response.Error(v1.ErrorCode_SYSTEM_ERROR, err.Error()), err
 	}
-	return &v1.Response{
-		Code:    int32(v1.ErrorCode_SUCCESS),
-		Success: true,
-		Message: "注册成功",
-	}, nil
+	return response.SuccessWithMsg("注册成功"), nil
 }
