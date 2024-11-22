@@ -33,6 +33,12 @@ func NewUserUseCase(repo UserRepo, logger log.Logger) *UserUseCase {
 }
 
 func (uc *UserUseCase) Register(ctx context.Context, u *User) error {
-	uc.log.WithContext(ctx).Infof("Register: %v", u.Username)
-	return uc.repo.CreateUser(ctx, u)
+	uc.log.WithContext(ctx).Infof("[register start]: %v", u.Username)
+	err := uc.repo.CreateUser(ctx, u)
+	if err != nil {
+		uc.log.WithContext(ctx).Errorf("[register failed]: %v, error: %v", u.Username, err)
+		return err
+	}
+	uc.log.WithContext(ctx).Infof("[register success]: %v", u.Username)
+	return nil
 }

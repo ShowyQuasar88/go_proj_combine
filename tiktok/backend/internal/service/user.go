@@ -22,9 +22,19 @@ func (s *UserService) Register(ctx context.Context, req *v1.RegisterRequest) (*v
 	user := &biz.User{
 		Username: req.Username,
 		Password: req.Password,
+		Phone:    req.Phone,
+		Email:    req.Email,
 	}
 	if err := s.uc.Register(ctx, user); err != nil {
-		return nil, err
+		return &v1.Response{
+			Code:    int32(v1.ErrorCode_SYSTEM_ERROR),
+			Success: false,
+			Message: err.Error(),
+		}, err
 	}
-	return &v1.Response{}, nil
+	return &v1.Response{
+		Code:    int32(v1.ErrorCode_SUCCESS),
+		Success: true,
+		Message: "注册成功",
+	}, nil
 }

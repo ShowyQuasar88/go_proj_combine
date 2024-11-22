@@ -32,14 +32,19 @@ func (r *userRepo) CreateUser(ctx context.Context, u *biz.User) error {
 		return err
 	}
 
-	encryptedPhone, err := r.crypto.Encrypt(u.Phone)
-	if err != nil {
-		return err
+	encryptedPhone, encryptedEmail := "", ""
+	if u.Phone != "" {
+		encryptedPhone, err = r.crypto.Encrypt(u.Phone)
+		if err != nil {
+			return err
+		}
 	}
 
-	encryptedEmail, err := r.crypto.Encrypt(u.Email)
-	if err != nil {
-		return err
+	if u.Email != "" {
+		encryptedEmail, err = r.crypto.Encrypt(u.Email)
+		if err != nil {
+			return err
+		}
 	}
 
 	inserted := &User{

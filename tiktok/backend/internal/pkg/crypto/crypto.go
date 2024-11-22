@@ -6,7 +6,9 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/base64"
+	"encoding/hex"
 	"errors"
+	"fmt"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -17,9 +19,29 @@ type Crypto struct {
 }
 
 func NewCrypto(c *conf.Security) (*Crypto, error) {
+	// 将十六进制字符串转换为字节数组
+	aesKey, err := hex.DecodeString(c.AesKey)
+	if err != nil {
+		return nil, fmt.Errorf("invalid AES key format: %v", err)
+	}
+
+	aesIV, err := hex.DecodeString(c.AesIv)
+	if err != nil {
+		return nil, fmt.Errorf("invalid AES IV format: %v", err)
+	}
+
+	// 验证密钥长度
+	if len(aesKey) != 32 { // AES-256需要32字节密钥
+		return nil, fmt.Errorf("invalid AES key length: expected 32 bytes, got %d", len(aesKey))
+	}
+
+	if len(aesIV) != 16 { // AES需要16字节IV
+		return nil, fmt.Errorf("invalid AES IV length: expected 16 bytes, got %d", len(aesIV))
+	}
+
 	return &Crypto{
-		aesKey:     []byte(c.AesKey),
-		aesIV:      []byte(c.AesIv),
+		aesKey:     aesKey,
+		aesIV:      aesIV,
 		bcryptCost: int(c.BcryptCost),
 	}, nil
 }
