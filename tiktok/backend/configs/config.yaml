@@ -15,9 +15,9 @@ data:
     write_timeout: 0.2s
 
 trace:
-  endpoint: otel-collector:4318
+  endpoint: http://localhost:14268/api/traces
   sampler: 1.0
-  environment: development
+  environment: dev
 
 log:
   level: debug

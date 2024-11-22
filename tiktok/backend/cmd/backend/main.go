@@ -34,7 +34,7 @@ var (
 )
 
 func init() {
-	flag.StringVar(&flagconf, "conf", "./configs", "config path, eg: -conf config.yaml")
+	flag.StringVar(&flagconf, "conf", "../../configs", "config path, eg: -conf config.yaml")
 }
 
 func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {
@@ -64,7 +64,7 @@ func initLogger(c *conf.Log) log.Logger {
 
 // initTrace 初始化链路追踪
 func initTrace(c *conf.Trace) (*tracesdk.TracerProvider, error) {
-	return trace.NewTracerProvider(&trace.Options{
+	return trace.InitTracer(&trace.Options{
 		ServiceName: Name,
 		Endpoint:    c.Endpoint,
 		Sampler:     c.Sampler,

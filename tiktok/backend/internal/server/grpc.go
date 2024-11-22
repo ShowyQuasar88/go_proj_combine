@@ -5,6 +5,7 @@ import (
 	userV1 "backend/api/v1"
 	"backend/internal/conf"
 	"backend/internal/service"
+	"github.com/go-kratos/kratos/v2/middleware/tracing"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
@@ -16,6 +17,7 @@ func NewGRPCServer(c *conf.Server, greeter *service.GreeterService, user *servic
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),
+			tracing.Server(), // 添加链路追踪中间件
 		),
 	}
 	if c.Grpc.Network != "" {

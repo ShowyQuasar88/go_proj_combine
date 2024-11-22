@@ -1,14 +1,16 @@
 package trace
 
 import (
-	"context"
-
+	_ "context"
+	_ "errors"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
+	"go.opentelemetry.io/otel/exporters/jaeger"
+	_ "go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
+	_ "time"
 )
 
 type Options struct {
@@ -17,24 +19,21 @@ type Options struct {
 	Sampler     float64 `json:"sampler"`
 }
 
-func NewTracerProvider(opts *Options) (*tracesdk.TracerProvider, error) {
-	exp, err := otlptracehttp.New(
-		context.Background(),
-		otlptracehttp.WithEndpoint(opts.Endpoint),
-		otlptracehttp.WithInsecure(),
-	)
+func InitTracer(opts *Options) (*tracesdk.TracerProvider, error) {
+	exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(opts.Endpoint)))
 	if err != nil {
 		return nil, err
 	}
 
 	tp := tracesdk.NewTracerProvider(
-		tracesdk.WithBatcher(exp),
+		// 设置采样率
 		tracesdk.WithSampler(tracesdk.TraceIDRatioBased(opts.Sampler)),
-		tracesdk.WithResource(resource.NewWithAttributes(
-			semconv.SchemaURL,
+		// 设置批量处理
+		tracesdk.WithBatcher(exp),
+		// 设置资源信息
+		tracesdk.WithResource(resource.NewSchemaless(
 			semconv.ServiceNameKey.String(opts.ServiceName),
-			attribute.String("environment", "development"),
-		)),
+			attribute.String("environment", "production"))),
 	)
 
 	otel.SetTracerProvider(tp)
