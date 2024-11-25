@@ -36,8 +36,9 @@ message Data {
   message Redis {
     string network = 1;
     string addr = 2;
-    google.protobuf.Duration read_timeout = 3;
-    google.protobuf.Duration write_timeout = 4;
+    string password = 3;
+    google.protobuf.Duration read_timeout = 4;
+    google.protobuf.Duration write_timeout = 5;
   }
   Database database = 1;
   Redis redis = 2;
@@ -61,4 +62,9 @@ message Security {
   string aesKey = 1;    // AES 加密密钥
   string aesIv = 2;     // AES 初始化向量
   int32 bcryptCost = 3; // bcrypt 加密成本
+
+  // JWT
+  string jwtSecret = 4; // JWT密钥
+  int32 jwtExpire = 5;  // JWT过期时间(秒)
+  int32 jwtRefreshExpire = 6; // 刷新token过期时间(秒)
 }

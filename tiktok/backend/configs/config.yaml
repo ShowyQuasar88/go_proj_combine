@@ -10,7 +10,8 @@ data:
     driver: postgres
     source: "host=192.168.178.179 user=showyquasar88 password=showyquasar88 dbname=tiktok port=5432 sslmode=disable TimeZone=Asia/Shanghai"
   redis:
-    addr: 127.0.0.1:6379
+    addr: 192.168.178.179:6379
+    password: showyquasar88
     read_timeout: 0.2s
     write_timeout: 0.2s
 
