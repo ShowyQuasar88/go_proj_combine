@@ -3,8 +3,87 @@
 
 openapi: 3.0.3
 info:
-    title: ""
+    title: User API
+    description: 用户服务接口定义
     version: 0.0.1
-paths: {}
+paths:
+    /v1/user/login:
+        post:
+            tags:
+                - User
+            operationId: User_Login
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/v1.LoginRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/v1.Response'
+    /v1/user/register:
+        post:
+            tags:
+                - User
+            description: 用户注册
+            operationId: User_Register
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/v1.RegisterRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/v1.Response'
 components:
-    schemas: {}
+    schemas:
+        google.protobuf.Any:
+            type: object
+            properties:
+                '@type':
+                    type: string
+                    description: The type of the serialized message.
+            additionalProperties: true
+            description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+        v1.LoginRequest:
+            type: object
+            properties:
+                username:
+                    type: string
+                password:
+                    type: string
+        v1.RegisterRequest:
+            type: object
+            properties:
+                username:
+                    type: string
+                password:
+                    type: string
+                phone:
+                    type: string
+                email:
+                    type: string
+        v1.Response:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: enum
+                success:
+                    type: boolean
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/google.protobuf.Any'
+            description: 通用响应结构
+tags:
+    - name: User
