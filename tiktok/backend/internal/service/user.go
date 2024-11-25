@@ -6,6 +6,9 @@ import (
 	"backend/internal/pkg/response"
 	"context"
 	"errors"
+	"fmt"
+	"github.com/go-kratos/kratos/v2/transport/http"
+	"google.golang.org/protobuf/types/known/anypb"
 	"gorm.io/gorm"
 )
 
@@ -35,4 +38,35 @@ func (s *UserService) Register(ctx context.Context, req *v1.RegisterRequest) (*v
 		return response.Error(v1.ErrorCode_SYSTEM_ERROR, err.Error()), err
 	}
 	return response.SuccessWithMsg("注册成功"), nil
+}
+
+func (s *UserService) Login(ctx context.Context, req *v1.LoginRequest) (*v1.Response, error) {
+	user := &biz.User{
+		Username: req.Username,
+		Password: req.Password,
+	}
+	userResp, err := s.uc.Login(ctx, user)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return response.Error(v1.ErrorCode_USER_NOT_FOUND, "用户不存在或密码错误"), err
+		}
+		return response.Error(v1.ErrorCode_SYSTEM_ERROR, err.Error()), err
+	}
+
+	// 设置 cookies
+	if httpCtx, ok := ctx.(http.Context); ok {
+		httpCtx.Response().Header().Set("Set-Cookie",
+			fmt.Sprintf(
+				"token=%s; Path=/; Max-Age=%d; HttpOnly; Secure; SameSite=Strict",
+				userResp.Token,
+				userResp.ExpiresIn,
+			))
+	}
+
+	data, err := anypb.New(userResp)
+	if err != nil {
+		return response.Error(v1.ErrorCode_SYSTEM_ERROR, err.Error()), err
+	}
+
+	return response.SuccessWithData(data), nil
 }

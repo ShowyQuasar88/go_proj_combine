@@ -17,6 +17,12 @@ service User {
             body: "*"   // 使用 * 表示整个消息作为请求体
         };
     }
+    rpc Login (LoginRequest) returns (Response) {
+        option (google.api.http) = {
+            post: "/v1/user/login"
+            body: "*"
+        };
+    }
 }
 
 message RegisterRequest {
@@ -41,7 +47,27 @@ message RegisterRequest {
     }];
 }
 
-message RegisterResponse {
-    int64 userId = 1;
-    string token = 2;
+message LoginRequest {
+    string username = 1 [(validate.rules).string = {
+        min_len: 3,
+        max_len: 20,
+        pattern: "^[^<>?%&/\\\\]+$",    // 不允许特殊字符
+        ignore_empty: false
+    }];
+    string password = 2 [(validate.rules).string = {
+        min_len: 8,
+        max_len: 20,
+        ignore_empty: false
+    }];
+}
+
+message LoginResponse {
+    string token = 1;
+    int64 expiresIn = 2;
+    UserInfo userInfo = 3;
+}
+
+message UserInfo {
+    string id = 1;
+    string username = 2;
 }

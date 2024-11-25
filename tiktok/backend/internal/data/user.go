@@ -6,6 +6,7 @@ import (
 	"backend/internal/pkg/utils"
 	"context"
 	"github.com/go-kratos/kratos/v2/log"
+	"time"
 )
 
 type User struct {
@@ -24,6 +25,14 @@ type userRepo struct {
 	data   *Data
 	crypto *crypto.Crypto
 	log    *log.Helper
+}
+
+func NewUserRepo(data *Data, crypto *crypto.Crypto, logger log.Logger) biz.UserRepo {
+	return &userRepo{
+		data:   data,
+		crypto: crypto,
+		log:    log.NewHelper(logger),
+	}
 }
 
 func (r *userRepo) CreateUser(ctx context.Context, u *biz.User) error {
@@ -58,10 +67,25 @@ func (r *userRepo) CreateUser(ctx context.Context, u *biz.User) error {
 	return r.data.db.WithContext(ctx).Create(inserted).Error
 }
 
-func NewUserRepo(data *Data, crypto *crypto.Crypto, logger log.Logger) biz.UserRepo {
-	return &userRepo{
-		data:   data,
-		crypto: crypto,
-		log:    log.NewHelper(logger),
+func (r *userRepo) GetUserByUsername(ctx context.Context, username string) (*biz.User, error) {
+	var user User
+	err := r.data.db.WithContext(ctx).First(&user, "username = ?", username).Error
+	if err != nil {
+		return nil, err
 	}
+	return &biz.User{
+		ID:       user.ID,
+		Username: username,
+		Password: user.Password,
+		Phone:    user.Phone,
+		Email:    user.Email,
+	}, nil
+}
+
+func (r *userRepo) SaveUserToken(ctx context.Context, userID string, token string, expire time.Duration) error {
+	return nil
+}
+
+func (r *userRepo) GetUserToken(ctx context.Context, userID string) (string, error) {
+	return "", nil
 }
