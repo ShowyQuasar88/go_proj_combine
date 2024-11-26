@@ -31,3 +31,7 @@ security:
   aesKey: 5c259313928ef6edc1a2a56f7753121b1906ae39eb8b002d1b6b56d1a3782359
   aesIv: 104f2c7af8354aeb75f8a35fb52ac650
   bcrypt_cost: 12
+  jwt:
+    secret: cKtHqyLVQiZi8RRDyEoE6FxV34Wj9nCWsifnrnZt9rA=  # jwt 密钥
+    expire: 86400           # token 过期时间
+    refreshExpire: 86400  # 刷新token过期时间

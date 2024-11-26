@@ -64,7 +64,10 @@ message Security {
   int32 bcryptCost = 3; // bcrypt 加密成本
 
   // JWT
-  string jwtSecret = 4; // JWT密钥
-  int32 jwtExpire = 5;  // JWT过期时间(秒)
-  int32 jwtRefreshExpire = 6; // 刷新token过期时间(秒)
+  message Jwt {
+    string secret = 1; // JWT密钥
+    int32 expire = 2;  // JWT过期时间(秒)
+    int32 refreshExpire = 3; // 刷新token过期时间(秒)
+  }
+  Jwt jwt = 4;
 }
