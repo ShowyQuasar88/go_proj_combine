@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import LoginModal from '../auth/LoginModal'
 import { API_ROUTES } from '@/app/config/api'
+import UserDropdown from './UserDropdown'
+import { checkLoginStatus, getUsername } from '@/app/utils/auth'
 
 export default function Navbar() {
   const router = useRouter()
@@ -13,30 +15,42 @@ export default function Navbar() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
 
   useEffect(() => {
-    checkLoginStatus()
-  }, [])
-
-  async function checkLoginStatus() {
-    try {
-      const res = await fetch(API_ROUTES.AUTH.CHECK)
-      if (res.ok) {
-        const data = await res.json()
-        setIsLoggedIn(true)
-        setUsername(data.username)
+    const loggedIn = checkLoginStatus()
+    setIsLoggedIn(loggedIn)
+    if (loggedIn) {
+      const username = getUsername()
+      if (username) {
+        setUsername(username)
       }
-    } catch (error) {
-      console.error('检查登录状态失败:', error)
     }
-  }
+  }, [])
 
   async function handleLogout() {
     try {
-      await fetch(API_ROUTES.AUTH.LOGOUT, { method: 'POST' })
+      // 1. 发送注销请求
+      await fetch(API_ROUTES.AUTH.LOGOUT, { 
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'  // 确保发送 cookie
+      })
+      
+      // 2. 清除前端状态
       setIsLoggedIn(false)
       setUsername('')
+      
+      // 3. 重定向到首页
       router.push('/')
+      
+      // 4. 可选：清除其他前端状态（如果有的话）
+      // 例如：清除本地存储的用户偏好设置等
+      localStorage.removeItem('userPreferences')
+      
     } catch (error) {
       console.error('登出失败:', error)
+      // 5. 错误处理：显示错误提示
+      alert('退出登录失败，请重试')
     }
   }
 
@@ -51,21 +65,16 @@ export default function Navbar() {
               </Link>
             </div>
             
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center">
               {isLoggedIn ? (
-                <>
-                  <span className="text-gray-300">@{username}</span>
-                  <button
-                    onClick={handleLogout}
-                    className="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-900"
-                  >
-                    退出
-                  </button>
-                </>
+                <UserDropdown 
+                  username={username} 
+                  onLogout={handleLogout}
+                />
               ) : (
                 <button
                   onClick={() => setIsLoginModalOpen(true)}
-                  className="px-3 py-2 rounded-md text-sm font-medium text-white bg-primary hover:bg-primary/90"
+                  className="px-4 py-2 rounded-md text-sm font-medium text-white bg-primary hover:bg-primary/90"
                 >
                   登录
                 </button>
@@ -80,7 +89,14 @@ export default function Navbar() {
         onClose={() => setIsLoginModalOpen(false)}
         onSuccess={() => {
           setIsLoginModalOpen(false)
-          checkLoginStatus()
+          const loggedIn = checkLoginStatus()
+          setIsLoggedIn(loggedIn)
+          if (loggedIn) {
+            const username = getUsername()
+            if (username) {
+              setUsername(username)
+            }
+          }
         }}
       />
     </>

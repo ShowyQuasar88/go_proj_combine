@@ -97,3 +97,15 @@ func (uc *UserUseCase) Login(ctx context.Context, u *User) (*v1.LoginResponse, e
 		},
 	}, nil
 }
+
+func (uc *UserUseCase) Logout(ctx context.Context, username, userID string) error {
+	uc.log.WithContext(ctx).Infof("[logout start]: %v", username)
+
+	if err := uc.cache.DelUserToken(ctx, userID); err != nil {
+		uc.log.WithContext(ctx).Errorf("[set cache token failed]: %v, error: %v", username, err)
+		return err
+	}
+	uc.log.WithContext(ctx).Infof("[logout finish]: %v", username)
+
+	return nil
+}

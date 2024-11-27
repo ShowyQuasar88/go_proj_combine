@@ -3,6 +3,7 @@ syntax = "proto3";
 package v1;
 
 import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
 import "validate/validate.proto";
 import "v1/common.proto";
 
@@ -20,6 +21,12 @@ service User {
     rpc Login (LoginRequest) returns (Response) {
         option (google.api.http) = {
             post: "/v1/user/login"
+            body: "*"
+        };
+    }
+    rpc Logout (google.protobuf.Empty) returns (Response) {
+        option (google.api.http) = {
+            post: "/v1/user/logout"
             body: "*"
         };
     }

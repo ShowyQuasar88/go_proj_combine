@@ -25,6 +25,22 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/v1.Response'
+    /v1/user/logout:
+        post:
+            tags:
+                - User
+            operationId: User_Logout
+            requestBody:
+                content:
+                    application/json: {}
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/v1.Response'
     /v1/user/register:
         post:
             tags:

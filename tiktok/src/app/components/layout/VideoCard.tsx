@@ -7,6 +7,7 @@ import Link from 'next/link'
 import LoginModal from '../auth/LoginModal'
 import { API_ROUTES } from '@/app/config/api'
 import CommentDrawer from '../comment/CommentDrawer'
+import { checkLoginStatus } from '@/app/utils/auth'
 
 interface VideoCardProps {
   video: {
@@ -115,18 +116,13 @@ const VideoCard = forwardRef<HTMLVideoElement, VideoCardProps>(({ video, isActiv
     setIsShareModalOpen(true)
   }
 
-  const checkLogin = async () => {
-    try {
-      const res = await fetch(API_ROUTES.AUTH.CHECK)
-      if (!res.ok) {
-        setIsLoginModalOpen(true)
-        return false
-      }
-      return true
-    } catch (error) {
-      console.error('检查登录状态失败:', error)
+  const checkLogin = () => {
+    const isLoggedIn = checkLoginStatus()
+    if (!isLoggedIn) {
+      setIsLoginModalOpen(true)
       return false
     }
+    return true
   }
 
   return (

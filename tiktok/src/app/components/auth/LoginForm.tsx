@@ -26,15 +26,18 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
           username: formData.get('username'),
           password: formData.get('password')
         }),
+        credentials: 'include'  // 允许携带cookie
       })
 
-      if (!res.ok) {
-        throw new Error('登录失败')
+      const data = await res.json()
+      
+      if (!data.success) {
+        throw new Error(data.message || '登录失败')
       }
 
       onSuccess?.()
-    } catch (_) {
-      setError('用户名或密码错误')
+    } catch (error) {
+      setError(error instanceof Error ? error.message : '登录失败')
     } finally {
       setIsLoading(false)
     }
