@@ -6,8 +6,11 @@ import (
 	"backend/internal/pkg/response"
 	"context"
 	"errors"
+	"github.com/go-kratos/kratos/v2/transport"
+	khttp "github.com/go-kratos/kratos/v2/transport/http"
 	"google.golang.org/protobuf/types/known/anypb"
 	"gorm.io/gorm"
+	"net/http"
 )
 
 // UserService 是用户服务的实现
@@ -50,6 +53,36 @@ func (s *UserService) Login(ctx context.Context, req *v1.LoginRequest) (*v1.Resp
 		}
 		return response.Error(v1.ErrorCode_SYSTEM_ERROR, err.Error()), nil
 	}
+
+	// 设置 cookies
+	tr, ok := transport.FromServerContext(ctx)
+	if !ok {
+		return response.Error(v1.ErrorCode_SYSTEM_ERROR, "系统错误"), nil
+	}
+	userTokenCookie := &http.Cookie{
+		Name:     "user_token",
+		Value:    userResp.Token,
+		Path:     "/",
+		MaxAge:   int(userResp.ExpiresIn),
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
+	}
+	usernameCookie := &http.Cookie{
+		Name:     "username",
+		Value:    userResp.UserInfo.Username,
+		Path:     "/",
+		MaxAge:   int(userResp.ExpiresIn),
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
+	}
+	ht, ok := tr.(khttp.Transporter)
+	if !ok {
+		return response.Error(v1.ErrorCode_SYSTEM_ERROR, "系统错误"), nil
+	}
+	ht.ReplyHeader().Set("Set-Cookie", userTokenCookie.String())
+	ht.ReplyHeader().Set("Set-Cookie", usernameCookie.String())
 
 	data, err := anypb.New(userResp)
 	if err != nil {
