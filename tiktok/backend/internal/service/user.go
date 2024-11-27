@@ -49,9 +49,9 @@ func (s *UserService) Login(ctx context.Context, req *v1.LoginRequest) (*v1.Resp
 	userResp, err := s.uc.Login(ctx, user)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return response.Error(v1.ErrorCode_USER_NOT_FOUND, "用户不存在或密码错误"), err
+			return response.Error(v1.ErrorCode_USER_NOT_FOUND, "用户不存在或密码错误"), nil
 		}
-		return response.Error(v1.ErrorCode_SYSTEM_ERROR, err.Error()), err
+		return response.Error(v1.ErrorCode_SYSTEM_ERROR, err.Error()), nil
 	}
 
 	// 设置 cookies
@@ -76,7 +76,7 @@ func (s *UserService) Login(ctx context.Context, req *v1.LoginRequest) (*v1.Resp
 
 	data, err := anypb.New(userResp)
 	if err != nil {
-		return response.Error(v1.ErrorCode_SYSTEM_ERROR, err.Error()), err
+		return response.Error(v1.ErrorCode_SYSTEM_ERROR, err.Error()), nil
 	}
 
 	return response.SuccessWithData(data), nil
