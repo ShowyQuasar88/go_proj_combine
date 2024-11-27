@@ -1,8 +1,8 @@
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080'
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'
 
 export const API_ROUTES = {
   AUTH: {
-    LOGIN: `${API_BASE_URL}/api/auth/login`,
+    LOGIN: `${API_BASE_URL}/v1/user/login`,
     LOGOUT: `${API_BASE_URL}/api/auth/logout`,
     CHECK: `${API_BASE_URL}/api/auth/check`,
   },
