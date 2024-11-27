@@ -24,9 +24,9 @@ func NewHTTPServer(c *conf.Server, s *conf.Security, greeter *service.GreeterSer
 			handlers.AllowCredentials(),
 		)),
 		http.Middleware(
+			auth.NewJWTMiddleware(s.Jwt.Secret),
 			recovery.Recovery(),
 			tracing.Server(), // 添加链路追踪中间件
-			auth.NewJWTMiddleware(s.Jwt.Secret),
 		),
 	}
 	if c.Http.Network != "" {
