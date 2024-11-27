@@ -10,12 +10,19 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
 	"github.com/go-kratos/kratos/v2/transport/http"
+	"github.com/gorilla/handlers"
 )
 
 // NewHTTPServer new an HTTP server.
 func NewHTTPServer(c *conf.Server, s *conf.Security, greeter *service.GreeterService, user *service.UserService, logger log.Logger) *http.Server {
 	var opts = []http.ServerOption{
 		http.Address(c.Http.Network),
+		http.Filter(handlers.CORS(
+			handlers.AllowedOrigins([]string{"http://localhost:3000"}),
+			handlers.AllowedMethods([]string{"GET", "POST", "DELETE", "PUT", "OPTIONS"}),
+			handlers.AllowedHeaders([]string{"Content-Type", "Authorization", "Origin"}),
+			handlers.AllowCredentials(),
+		)),
 		http.Middleware(
 			recovery.Recovery(),
 			tracing.Server(), // 添加链路追踪中间件
