@@ -2,8 +2,8 @@ package classical_150
 
 // removeDuplicates 删除有序数组中的重复项
 func removeDuplicates(nums []int) int {
-	if len(nums) < 1 {
-		return 0
+	if len(nums) < 2 {
+		return len(nums)
 	}
 	cur := 0
 	for i := 1; i < len(nums); {
