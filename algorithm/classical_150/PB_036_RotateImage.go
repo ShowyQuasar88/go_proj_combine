@@ -1,7 +1,7 @@
 package classical_150
 
 // rotateImage 旋转图像
-func RotateImage(matrix [][]int) {
+func rotateImage(matrix [][]int) {
 	for top, bottom := 0, len(matrix)-1; top < bottom; top, bottom = top+1, bottom-1 {
 		for begin := 0; top+begin < bottom; begin++ {
 			tmp := matrix[top][top+begin]
