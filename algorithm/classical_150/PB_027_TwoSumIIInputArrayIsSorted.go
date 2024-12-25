@@ -1,7 +1,7 @@
 package classical_150
 
 // twoSum 两数之和 II - 输入有序数组
-func twoSum(numbers []int, target int) []int {
+func twoSumII(numbers []int, target int) []int {
 	left, right := 0, len(numbers)-1
 	for left < right {
 		if numbers[left]+numbers[right] > target {
