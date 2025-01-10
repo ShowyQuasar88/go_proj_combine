@@ -1,4 +1,4 @@
-package eazy
+package easy
 
 // twoSum 两数之和
 func twoSum(nums []int, target int) []int {
